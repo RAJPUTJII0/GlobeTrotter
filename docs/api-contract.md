@@ -80,6 +80,18 @@ Returns `201`:
 
 Authentication is required. `id` is the returned `stopActivity.id`, not the catalog `activityId`. Returns `204` with no response body.
 
+## Cities, stops, itinerary, and budget
+
+- `GET /cities?search=` returns an array of `{ id, name, country, costIndex }`.
+- `GET /trips/:tripId/stops` returns an array of stops with camelCase IDs/dates and nested `city`.
+- `POST /trips/:tripId/stops` accepts `{ cityId, startDate, endDate, stopOrder? }` and returns the created stop (`201`).
+- `DELETE /trips/:tripId/stops/:stopId` returns `204`.
+- `GET /trips/:tripId/itinerary` returns `{ trip, stops }`, where every stop contains `city` and `activities`.
+- `GET /trips/:tripId/expenses` returns `{ expenses }`.
+- `POST /trips/:tripId/expenses` accepts `{ category, amount, note? }` where category is `transport`, `stay`, `food`, or `other`; returns `{ expense }` (`201`).
+- `DELETE /trips/:tripId/expenses/:expenseId` returns `204`.
+- `GET /trips/:tripId/budget` returns `{ breakdown, total, budgetLimit, remaining, averagePerDay }`. Activity costs are calculated from stop activities.
+
 ## Errors
 
 ```json

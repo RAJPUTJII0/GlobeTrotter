@@ -28,9 +28,11 @@ CREATE TABLE trips (
   end_date DATE NOT NULL,
   is_public BOOLEAN NOT NULL DEFAULT FALSE,
   share_slug VARCHAR(120) UNIQUE,
+  budget_limit NUMERIC(12, 2),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CHECK (end_date >= start_date)
+  , CHECK (budget_limit IS NULL OR budget_limit >= 0)
 );
 
 CREATE TABLE trip_stops (
@@ -84,3 +86,6 @@ CREATE INDEX idx_trip_stops_trip_id ON trip_stops(trip_id);
 CREATE INDEX idx_activities_city_id ON activities(city_id);
 CREATE INDEX idx_stop_activities_stop_id ON stop_activities(trip_stop_id);
 CREATE INDEX idx_expenses_trip_id ON expenses(trip_id);
+
+-- Safe migration when applying this schema to an existing Neon database.
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS budget_limit NUMERIC(12, 2);

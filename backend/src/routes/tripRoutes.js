@@ -1,8 +1,14 @@
 import { Router } from 'express';
-import { createTrip, deleteTrip, getTrips } from '../controllers/tripController.js';
+import { createTrip, deleteTrip, getTrip, getItinerary, getTrips } from '../controllers/tripController.js';
+import { createStop, deleteStop, getStops } from '../controllers/stopController.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 const router = Router();
 router.use(requireAuth);
 router.route('/').get(getTrips).post(createTrip);
+router.get('/:tripId/stops', getStops);
+router.post('/:tripId/stops', createStop);
+router.delete('/:tripId/stops/:stopId', deleteStop);
+router.get('/:tripId/itinerary', getItinerary);
+router.get('/:tripId', getTrip);
 router.delete('/:tripId', deleteTrip);
 export default router;

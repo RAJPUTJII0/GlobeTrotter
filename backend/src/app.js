@@ -3,6 +3,8 @@ import express from 'express';
 import authRoutes from './routes/authRoutes.js';
 import tripRoutes from './routes/tripRoutes.js';
 import activityRoutes from './routes/activityRoutes.js';
+import cityRoutes from './routes/cityRoutes.js';
+import expenseRoutes from './routes/expenseRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
@@ -11,6 +13,8 @@ app.use(express.json());
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/trips', expenseRoutes);
+app.use('/api/cities', cityRoutes);
 app.use('/api', activityRoutes);
 app.use(errorHandler);
 export default app;
