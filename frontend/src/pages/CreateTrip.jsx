@@ -4,7 +4,9 @@ import Navbar from '../components/Navbar.jsx';
 import '../styles/trip-form.css';
 import { createTrip } from '../services/tripService.js';
 
-const initialForm = { title: '', startDate: '', endDate: '', description: '' };
+const currencies = { INR: '₹ INR', USD: '$ USD', EUR: '€ EUR', GBP: '£ GBP', JPY: '¥ JPY', AED: 'د.إ AED', AUD: 'A$ AUD' };
+const travelStyles = ['Culture', 'Food', 'Adventure', 'Nature', 'Nightlife', 'Shopping', 'Relaxation', 'Photography'];
+const initialForm = { title: '', startDate: '', endDate: '', description: '', budgetLimit: '', currency: 'INR', travelStyles: [] };
 
 export default function CreateTrip() {
   const navigate = useNavigate();
@@ -15,6 +17,10 @@ export default function CreateTrip() {
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function toggleStyle(style) {
+    setForm((current) => ({ ...current, travelStyles: current.travelStyles.includes(style) ? current.travelStyles.filter((item) => item !== style) : [...current.travelStyles, style] }));
   }
 
   async function handleSubmit(event) {
@@ -31,10 +37,15 @@ export default function CreateTrip() {
       return;
     }
 
+    if (form.budgetLimit !== '' && (!Number.isFinite(Number(form.budgetLimit)) || Number(form.budgetLimit) < 0)) {
+      setError('Budget limit must be a non-negative number.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
     try {
-      await createTrip({ title, description: form.description.trim(), startDate: form.startDate, endDate: form.endDate });
+      await createTrip({ title, description: form.description.trim(), startDate: form.startDate, endDate: form.endDate, budgetLimit: form.budgetLimit === '' ? null : Number(form.budgetLimit), currency: form.currency, travelStyles: form.travelStyles });
       navigate('/my-trips');
     } catch (requestError) {
       setError(requestError.message);
@@ -59,6 +70,11 @@ export default function CreateTrip() {
             </div>
             <label htmlFor="description">Description <small>(optional)</small></label>
             <textarea id="description" name="description" value={form.description} onChange={updateField} placeholder="What kind of adventure are you planning?" rows="5" />
+            <label htmlFor="budgetLimit">Budget limit <small>(optional)</small></label>
+            <input id="budgetLimit" name="budgetLimit" type="number" min="0" step="0.01" value={form.budgetLimit} onChange={updateField} placeholder="e.g. 50000" />
+            <label htmlFor="currency">Currency</label>
+            <select id="currency" name="currency" value={form.currency} onChange={updateField}>{Object.entries(currencies).map(([code, label]) => <option key={code} value={code}>{label}</option>)}</select>
+            <fieldset><legend>Travel style (optional)</legend><div className="style-chips">{travelStyles.map((style) => <button className={form.travelStyles.includes(style) ? 'style-chip selected' : 'style-chip'} key={style} onClick={() => toggleStyle(style)} type="button" aria-pressed={form.travelStyles.includes(style)}>{form.travelStyles.includes(style) ? '✓ ' : ''}{style}</button>)}</div></fieldset>
             {error && <p className="form-error" role="alert">{error}</p>}
             <div className="form-actions"><button className="cancel-button" disabled={isSubmitting} onClick={() => navigate('/dashboard')} type="button">Cancel</button><button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? 'Creating trip...' : 'Create trip →'}</button></div>
           </form>

@@ -9,7 +9,11 @@ import shareRoutes from './routes/shareRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
-app.use(cors());
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean);
+app.use(cors({ origin: (origin, callback) => {
+  if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+  return callback(null, false);
+} }));
 app.use(express.json());
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);

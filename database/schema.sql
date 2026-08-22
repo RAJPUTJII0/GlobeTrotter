@@ -16,6 +16,11 @@ CREATE TABLE cities (
   name VARCHAR(120) NOT NULL,
   country VARCHAR(120) NOT NULL,
   cost_index NUMERIC(6, 2) NOT NULL DEFAULT 1.00,
+  country_code VARCHAR(8),
+  region VARCHAR(80),
+  latitude NUMERIC(9, 6),
+  longitude NUMERIC(9, 6),
+  image_url TEXT,
   UNIQUE (name, country)
 );
 
@@ -29,6 +34,8 @@ CREATE TABLE trips (
   is_public BOOLEAN NOT NULL DEFAULT FALSE,
   share_slug VARCHAR(120) UNIQUE,
   budget_limit NUMERIC(12, 2),
+  currency VARCHAR(3) NOT NULL DEFAULT 'INR',
+  travel_styles TEXT[] NOT NULL DEFAULT '{}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CHECK (end_date >= start_date)
@@ -50,6 +57,7 @@ CREATE TABLE activities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   city_id UUID NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
   name VARCHAR(150) NOT NULL,
+  description TEXT,
   category VARCHAR(80) NOT NULL DEFAULT 'sightseeing',
   duration_hours NUMERIC(4, 1) NOT NULL DEFAULT 1.0,
   estimated_cost NUMERIC(12, 2) NOT NULL DEFAULT 0,
@@ -65,6 +73,7 @@ CREATE TABLE stop_activities (
   scheduled_date DATE,
   scheduled_time TIME,
   custom_cost NUMERIC(12, 2),
+  activity_order INTEGER,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CHECK (custom_cost IS NULL OR custom_cost >= 0),
   UNIQUE (trip_stop_id, activity_id, scheduled_date)
@@ -89,3 +98,13 @@ CREATE INDEX idx_expenses_trip_id ON expenses(trip_id);
 
 -- Safe migration when applying this schema to an existing Neon database.
 ALTER TABLE trips ADD COLUMN IF NOT EXISTS budget_limit NUMERIC(12, 2);
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS cover_image TEXT;
+ALTER TABLE activities ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE stop_activities ADD COLUMN IF NOT EXISTS activity_order INTEGER;
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS country_code VARCHAR(8);
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS region VARCHAR(80);
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS latitude NUMERIC(9, 6);
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS longitude NUMERIC(9, 6);
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS image_url TEXT;
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS currency VARCHAR(3) NOT NULL DEFAULT 'INR';
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS travel_styles TEXT[] NOT NULL DEFAULT '{}';

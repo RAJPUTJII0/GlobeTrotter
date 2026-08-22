@@ -1,7 +1,7 @@
 import { query } from '../config/db.js';
 
 const stopSelect = `s.id, s.trip_id AS "tripId", s.city_id AS "cityId", s.start_date AS "startDate", s.end_date AS "endDate", s.stop_order AS "stopOrder",
-  json_build_object('id', c.id, 'name', c.name, 'country', c.country) AS city`;
+  json_build_object('id', c.id, 'name', c.name, 'country', c.country, 'imageUrl', c.image_url, 'region', c.region) AS city`;
 
 export async function getStops(req, res, next) {
   try {

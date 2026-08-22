@@ -1,13 +1,3 @@
-export default function TripCard({ title, dates, cities, emoji, onView }) {
-  return (
-    <article className="trip-card">
-      <div className="trip-card-image" aria-hidden="true">{emoji}</div>
-      <div className="trip-card-content">
-        <p className="trip-card-dates">{dates}</p>
-        <h3>{title}</h3>
-        <p>{cities} destinations</p>
-        <button onClick={onView} type="button">View itinerary →</button>
-      </div>
-    </article>
-  );
-}
+import TravelImage from './TravelImage.jsx';
+import { formatMoney } from '../utils/currency.js';
+export default function TripCard({title,dates,cities,emoji,image,budget,currency='INR',onView}){return <article className="trip-card">{image?<TravelImage className="trip-card-image" src={image} alt={`${title} destination`}/>:<div className="trip-card-image" aria-hidden="true">{emoji}</div>}<div className="trip-card-content"><p className="trip-card-dates">{dates}</p><h3>{title}</h3><p>{cities} destinations</p>{budget&&<p>{budget.budgetLimit===null?`Spent ${formatMoney(budget.total,currency)}`:budget.remaining<0?`Over budget by ${formatMoney(Math.abs(budget.remaining),currency)}`:`${formatMoney(budget.remaining,currency)} remaining`}</p>}<button onClick={onView} type="button">View itinerary →</button></div></article>}

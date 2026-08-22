@@ -2,73 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import TripCard from '../components/TripCard.jsx';
+import TravelImage from '../components/TravelImage.jsx';
+import WorldMap from '../components/WorldMap.jsx';
 import '../styles/dashboard.css';
-import { getTrips } from '../services/tripService.js';
-
-const destinations = [
-  { name: 'Jaipur', country: 'India', emoji: '🏰' },
-  { name: 'Goa', country: 'India', emoji: '🏖️' },
-  { name: 'Tokyo', country: 'Japan', emoji: '🗼' },
-  { name: 'Paris', country: 'France', emoji: '🗼' },
-];
-
-export default function Dashboard() {
-  const navigate = useNavigate();
-  const savedUser = JSON.parse(localStorage.getItem('globetrotter_user') || '{}');
-  const userName = savedUser.name || 'Traveller';
-  const [trips, setTrips] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    let isMounted = true;
-    getTrips()
-      .then((items) => {
-        if (isMounted) setTrips(items);
-      })
-      .catch((requestError) => {
-        if (isMounted) setError(requestError.message);
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-    return () => { isMounted = false; };
-  }, []);
-
-  function formatDates(trip) {
-    const formatter = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-    return `${formatter.format(new Date(`${trip.startDate}T00:00:00`))} — ${formatter.format(new Date(`${trip.endDate}T00:00:00`))}`;
-  }
-
-  return (
-    <div className="app-shell">
-      <Navbar />
-      <main className="dashboard-page">
-        <section className="dashboard-hero">
-          <div>
-            <p className="eyebrow">YOUR TRAVEL HUB</p>
-            <h1>Welcome back, {userName}!</h1>
-            <p>Where would you like to explore next?</p>
-          </div>
-          <button className="primary-button" onClick={() => navigate('/create-trip')} type="button">+ Plan New Trip</button>
-        </section>
-
-        <section className="content-section" aria-labelledby="upcoming-trips">
-          <div className="section-heading"><div><h2 id="upcoming-trips">Your upcoming trips</h2><p>Keep your plans organised in one place.</p></div><Link to="/my-trips">View all trips</Link></div>
-          {isLoading ? <p role="status">Loading your trips...</p> : error ? <p className="form-error" role="alert">{error}</p> : trips.length > 0 ? (
-            <div className="trip-grid">{trips.slice(0, 2).map((trip) => <TripCard key={trip.id} title={trip.title} dates={formatDates(trip)} cities={trip.destinationCount} emoji="✈️" onView={() => navigate(`/itinerary/${trip.id}`)} />)}</div>
-          ) : (
-            <div className="dashboard-empty"><span aria-hidden="true">🧭</span><div><h3>No trips planned yet</h3><p>Create your first trip and start building your itinerary.</p></div><Link to="/create-trip">Plan a trip</Link></div>
-          )}
-        </section>
-
-        <section className="content-section" aria-labelledby="popular-destinations">
-          <div className="section-heading"><div><h2 id="popular-destinations">Popular destinations</h2><p>Get inspired for your next adventure.</p></div></div>
-          <div className="destination-grid">
-            {destinations.map((destination) => <article className="destination-card" key={destination.name}><span aria-hidden="true">{destination.emoji}</span><div><h3>{destination.name}</h3><p>{destination.country}</p></div></article>)}
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-}
+import { getBudget, getTrips } from '../services/tripService.js';
+const destinations=[{name:'Jaipur',country:'India',image:'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80'},{name:'Goa',country:'India',image:'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80'},{name:'Tokyo',country:'Japan',image:'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=600&q=80'},{name:'Paris',country:'France',image:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80'}];
+function formatDates(trip){const formatter=new Intl.DateTimeFormat('en-IN',{day:'numeric',month:'short',year:'numeric'});const format=value=>{if(!value)return'N/A';const date=new Date(/^\d{4}-\d{2}-\d{2}$/.test(value)?`${value}T00:00:00`:value);return Number.isNaN(date.getTime())?'N/A':formatter.format(date);};return `${format(trip.startDate)} — ${format(trip.endDate)}`;}
+export default function Dashboard(){const navigate=useNavigate();const savedUser=JSON.parse(localStorage.getItem('globetrotter_user')||'{}');const [trips,setTrips]=useState([]);const [isLoading,setIsLoading]=useState(true);const [error,setError]=useState('');const [budgets,setBudgets]=useState({});useEffect(()=>{let mounted=true;getTrips().then(async items=>{if(!mounted)return;setTrips(items);const result=await Promise.all(items.map(async trip=>[trip.id,await getBudget(trip.id).catch(()=>null)]));if(mounted)setBudgets(Object.fromEntries(result.filter(([,budget])=>budget)));}).catch(e=>mounted&&setError(e.message)).finally(()=>mounted&&setIsLoading(false));return()=>{mounted=false;};},[]);const mapTrip=trips[0];return <div className="app-shell"><Navbar/><main className="dashboard-page"><section className="dashboard-hero"><div><p className="eyebrow">YOUR TRAVEL HUB</p><h1>Good morning, {savedUser.name||'Traveller'} ✈️</h1><p>Ready for your next adventure?</p></div><button className="primary-button" onClick={()=>navigate('/create-trip')} type="button">+ Plan New Trip</button></section><section className="dashboard-stats"><div><strong>{trips.length}</strong><span>Total trips</span></div><div><strong>{trips.filter(trip=>new Date(trip.endDate)>=new Date()).length}</strong><span>Upcoming</span></div><div><strong>{trips.reduce((sum,trip)=>sum+Number(trip.destinationCount||0),0)}</strong><span>Cities to explore</span></div><div><strong>∞</strong><span>Memories ahead</span></div></section>{mapTrip&&<section className="dashboard-map-section"><div className="section-heading"><div><p className="eyebrow">YOUR ROUTE</p><h2>See the journey</h2></div><Link to={`/itinerary/${mapTrip.id}`}>Open itinerary →</Link></div><WorldMap tripId={mapTrip.id}/></section>}<section className="content-section"><div className="section-heading"><div><h2>Your upcoming trips</h2><p>Keep your plans organised in one place.</p></div><Link to="/my-trips">View all trips →</Link></div>{isLoading?<div className="skeleton-line" role="status"/>:error?<p className="form-error" role="alert">{error}</p>:trips.length?<div className="trip-grid">{trips.slice(0,2).map((trip,index)=><TripCard key={trip.id} title={trip.title} dates={formatDates(trip)} cities={trip.destinationCount} image={destinations[index%destinations.length].image} emoji="✈️" budget={budgets[trip.id]} currency={trip.currency||'INR'} onView={()=>navigate(`/itinerary/${trip.id}`)}/>)}</div>:<div className="dashboard-empty"><span aria-hidden="true">🧭</span><div><h3>Your next adventure starts here.</h3><p>Create your first trip and start building your itinerary.</p></div><Link to="/create-trip">Plan a trip →</Link></div>}</section><section className="content-section"><div className="section-heading"><div><p className="eyebrow">GET INSPIRED</p><h2>Popular destinations</h2></div></div><div className="destination-grid">{destinations.map(destination=><article className="destination-card" key={destination.name}><TravelImage src={destination.image} alt={`${destination.name}, ${destination.country}`}/><div><h3>{destination.name}</h3><p>{destination.country}</p></div></article>)}</div></section></main></div>}

@@ -8,18 +8,23 @@ import Login from '../pages/Login.jsx';
 import MyTrips from '../pages/MyTrips.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Signup from '../pages/Signup.jsx';
+import Profile from '../pages/Profile.jsx';
 import PublicTrip from '../pages/PublicTrip.jsx';
+import Landing from '../pages/Landing.jsx';
+import Explore from '../pages/Explore.jsx';
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/public/:slug" element={<PublicTrip />} />
+      <Route path="/explore" element={<Explore />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
       <Route path="/my-trips" element={<ProtectedRoute><MyTrips /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/itinerary/:tripId" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
       <Route path="/itinerary-builder/:tripId" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
       <Route path="/budget/:tripId" element={<ProtectedRoute><Budget /></ProtectedRoute>} />

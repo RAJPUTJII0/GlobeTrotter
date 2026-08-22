@@ -40,3 +40,21 @@ export async function login(req, res, next) {
     return next(error);
   }
 }
+
+export async function getMe(req, res, next) {
+  try {
+    const result = await query('SELECT id, name, email, created_at AS "createdAt" FROM users WHERE id=$1', [req.user.id]);
+    if (!result.rowCount) return res.status(404).json({ message: 'User not found.' });
+    return res.json({ user: result.rows[0] });
+  } catch (error) { return next(error); }
+}
+
+export async function updateMe(req, res, next) {
+  try {
+    const name = req.body.name?.trim();
+    if (!name) return res.status(400).json({ message: 'Name is required.' });
+    const result = await query('UPDATE users SET name=$1 WHERE id=$2 RETURNING id, name, email, created_at AS "createdAt"', [name, req.user.id]);
+    if (!result.rowCount) return res.status(404).json({ message: 'User not found.' });
+    return res.json({ user: result.rows[0] });
+  } catch (error) { return next(error); }
+}

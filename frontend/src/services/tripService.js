@@ -24,6 +24,7 @@ export const getCities = (search = '') => api(`/cities${search ? `?search=${enco
 export const getTripStops = (tripId) => api(`/trips/${tripId}/stops`);
 export const createTripStop = (tripId, data) => api(`/trips/${tripId}/stops`, { method: 'POST', body: JSON.stringify(data) });
 export const deleteTripStop = (tripId, stopId) => api(`/trips/${tripId}/stops/${stopId}`, { method: 'DELETE' });
+export const reorderTripStop = (tripId, stopId, stopOrder) => api(`/trips/${tripId}/stops/${stopId}`, { method: 'PATCH', body: JSON.stringify({ stopOrder }) });
 export const getItinerary = (tripId) => api(`/trips/${tripId}/itinerary`);
 export const getExpenses = (tripId) => api(`/trips/${tripId}/expenses`);
 export const createExpense = (tripId, data) => api(`/trips/${tripId}/expenses`, { method: 'POST', body: JSON.stringify(data) });
@@ -31,3 +32,4 @@ export const deleteExpense = (tripId, expenseId) => api(`/trips/${tripId}/expens
 export const getBudget = (tripId) => api(`/trips/${tripId}/budget`);
 export const shareTrip = (tripId) => api(`/trips/${tripId}/share`, { method: 'POST' });
 export const getPublicTrip = (shareSlug) => api(`/public/trips/${shareSlug}`);
+export const copyPublicTrip = (shareSlug) => api(`/public/trips/${shareSlug}/copy`, { method: 'POST' });

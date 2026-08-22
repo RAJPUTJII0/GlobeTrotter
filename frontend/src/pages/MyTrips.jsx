@@ -6,7 +6,10 @@ import { deleteTrip, getTrips, shareTrip } from '../services/tripService.js';
 
 function formatDate(date) {
   if (!date) return 'Date not set';
-  return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${date}T00:00:00`));
+  const value = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T00:00:00` : date;
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) return 'Date not set';
+  return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(parsedDate);
 }
 
 export default function MyTrips() {
@@ -74,7 +77,7 @@ export default function MyTrips() {
                 <div className="saved-trip-icon" aria-hidden="true">✈️</div>
                 <div className="saved-trip-details">
                   <p className="saved-trip-dates">{formatDate(trip.startDate)} — {formatDate(trip.endDate)}</p>
-                  <h2>{trip.title}</h2>
+                  <h2>{trip.title} <span className="trip-currency">{trip.currency || 'INR'}</span></h2>
                   <p className="trip-description">{trip.description || 'No description added yet.'}</p>
                   <p className="destination-count">📍 {trip.destinationCount} destinations</p>
                   <div className="trip-actions">

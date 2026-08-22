@@ -1,6 +1,7 @@
 import pg from 'pg';
 
-const { Pool } = pg;
+const { Pool, types } = pg;
+types.setTypeParser(1082, (value) => value);
 let pool;
 
 function getPool() {
@@ -25,7 +26,13 @@ export async function query(text, params) {
 }
 
 export async function verifyDatabaseConnection() {
-  await getPool().query('SELECT 1');
+  const database = getPool();
+  await database.query('ALTER TABLE trips ADD COLUMN IF NOT EXISTS cover_image TEXT');
+  await database.query('ALTER TABLE activities ADD COLUMN IF NOT EXISTS description TEXT');
+  await database.query('ALTER TABLE stop_activities ADD COLUMN IF NOT EXISTS activity_order INTEGER');
+  await database.query("ALTER TABLE trips ADD COLUMN IF NOT EXISTS currency VARCHAR(3) NOT NULL DEFAULT 'INR'");
+  await database.query("ALTER TABLE trips ADD COLUMN IF NOT EXISTS travel_styles TEXT[] NOT NULL DEFAULT '{}'");
+  await database.query('SELECT 1');
 }
 
 export { getPool };
