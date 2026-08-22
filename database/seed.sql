@@ -1,0 +1,1 @@
+-- Add demo cities, activities, and a Delhi → Jaipur → Mumbai trip here.
