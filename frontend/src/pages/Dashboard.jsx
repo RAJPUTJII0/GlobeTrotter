@@ -38,7 +38,7 @@ export default function Dashboard() {
         <section className="content-section" aria-labelledby="upcoming-trips">
           <div className="section-heading"><div><h2 id="upcoming-trips">Your upcoming trips</h2><p>Keep your plans organised in one place.</p></div><Link to="/my-trips">View all trips</Link></div>
           {trips.length > 0 ? (
-            <div className="trip-grid">{trips.slice(0, 2).map((trip) => <TripCard key={trip.id} title={trip.title} dates={formatDates(trip)} cities={trip.stops?.length || 0} emoji="✈️" onView={() => navigate('/my-trips')} />)}</div>
+            <div className="trip-grid">{trips.slice(0, 2).map((trip) => <TripCard key={trip.id} title={trip.title} dates={formatDates(trip)} cities={trip.stops?.length || 0} emoji="✈️" onView={() => navigate(`/itinerary/${trip.id}`)} />)}</div>
           ) : (
             <div className="dashboard-empty"><span aria-hidden="true">🧭</span><div><h3>No trips planned yet</h3><p>Create your first trip and start building your itinerary.</p></div><Link to="/create-trip">Plan a trip</Link></div>
           )}

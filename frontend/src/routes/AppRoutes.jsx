@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import CreateTrip from '../pages/CreateTrip.jsx';
 import Dashboard from '../pages/Dashboard.jsx';
+import ItineraryBuilder from '../pages/ItineraryBuilder.jsx';
+import ItineraryView from '../pages/ItineraryView.jsx';
 import Login from '../pages/Login.jsx';
 import MyTrips from '../pages/MyTrips.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
@@ -15,6 +17,8 @@ export default function AppRoutes() {
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
       <Route path="/my-trips" element={<ProtectedRoute><MyTrips /></ProtectedRoute>} />
+      <Route path="/itinerary/:tripId" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
+      <Route path="/itinerary-builder/:tripId" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/my-trips.css';
 import { getStoredTrips, removeStoredTrip } from '../utils/tripStorage.js';
@@ -10,6 +10,7 @@ function formatDate(date) {
 }
 
 export default function MyTrips() {
+  const navigate = useNavigate();
   const [trips, setTrips] = useState(getStoredTrips);
   const [notice, setNotice] = useState('');
 
@@ -45,8 +46,8 @@ export default function MyTrips() {
                   <p className="trip-description">{trip.description || 'No description added yet.'}</p>
                   <p className="destination-count">📍 {trip.stops?.length || 0} destinations</p>
                   <div className="trip-actions">
-                    <button className="view-button" onClick={() => setNotice('Itinerary view will be connected when Member 2 completes the builder.')} type="button">View itinerary</button>
-                    <button onClick={() => setNotice('Editing will be available with the itinerary builder.')} type="button">Edit</button>
+                    <button className="view-button" onClick={() => navigate(`/itinerary/${trip.id}`)} type="button">View itinerary</button>
+                    <button onClick={() => navigate(`/itinerary-builder/${trip.id}`)} type="button">Edit</button>
                     <button className="delete-button" onClick={() => deleteTrip(trip.id)} type="button">Delete</button>
                   </div>
                 </div>
