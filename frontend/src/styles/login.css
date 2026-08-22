@@ -1,0 +1,45 @@
+.auth-page {
+  align-items: center;
+  background: radial-gradient(circle at top left, #c8e7ff 0%, transparent 38%), linear-gradient(135deg, #f5f8ff 0%, #eaf3ff 100%);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #dbe6f4;
+  border-radius: 24px;
+  box-shadow: 0 22px 60px rgba(28, 78, 121, 0.15);
+  max-width: 430px;
+  padding: 40px;
+  text-align: center;
+  width: 100%;
+}
+
+.brand-mark {
+  align-items: center;
+  background: #146c94;
+  border-radius: 14px;
+  color: white;
+  display: inline-flex;
+  font-size: 24px;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.brand-name { color: #146c94; font-weight: 800; letter-spacing: 0.04em; margin: 12px 0 20px; }
+.auth-card h1 { font-size: 30px; margin: 0; }
+.auth-subtitle { color: #637087; margin: 10px 0 28px; }
+.auth-form { display: grid; gap: 10px; text-align: left; }
+.auth-form label { color: #34415a; font-size: 14px; font-weight: 700; margin-top: 6px; }
+.auth-form input { border: 1px solid #c7d4e5; border-radius: 10px; outline-color: #146c94; padding: 13px 14px; width: 100%; }
+.auth-form button { background: #146c94; border: 0; border-radius: 10px; color: white; cursor: pointer; font-weight: 700; margin-top: 14px; padding: 13px; }
+.auth-form button:hover { background: #0e5779; }
+.form-error { color: #b42318; font-size: 14px; margin: 4px 0 0; }
+.signup-note { color: #637087; font-size: 14px; margin: 24px 0 0; }
+.signup-note span { color: #146c94; font-weight: 700; }
+
+@media (max-width: 480px) { .auth-card { padding: 32px 24px; } }
