@@ -6,6 +6,7 @@ import {
 	createTripStop,
 	deleteTripStop,
 	getCities,
+	getItinerary,
 	getTripStops,
 	getTrips,
 } from '../services/tripService.js';
@@ -58,12 +59,24 @@ export default function ItineraryBuilder() {
 			setLoading(true);
 			setError('');
 			try {
-				const [availableCities, tripStops] = await Promise.all([
+				const [availableCities, tripStops, itinerary] = await Promise.all([
 					getCities(),
 					getTripStops(tripId),
+					getItinerary(tripId),
 				]);
 				setCities(availableCities);
 				setStops(tripStops);
+				const savedActivities = {};
+				(itinerary.stops || []).forEach((stop) => (stop.activities || []).forEach((item) => {
+					savedActivities[item.id] = {
+						id: item.id,
+						trip_stop_id: stop.id,
+						activity_id: item.activityId,
+						custom_cost: item.cost,
+						activity: { id: item.activityId, name: item.name, category: item.category, duration_hours: item.durationHours, estimated_cost: item.cost },
+					};
+				}));
+				setAddedActivities(savedActivities);
 			} catch (requestError) {
 				setError(requestError.message || 'Unable to load itinerary data.');
 			} finally {
