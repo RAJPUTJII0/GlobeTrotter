@@ -9,7 +9,11 @@ import shareRoutes from './routes/shareRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean);
+const allowedOrigins = [...new Set([
+  'http://localhost:5173',
+  'https://globe-trotter-d6ys.vercel.app',
+  ...(process.env.FRONTEND_URL || '').split(','),
+].map((origin) => origin.trim()).filter(Boolean))];
 app.use(cors({ origin: (origin, callback) => {
   if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
   return callback(null, false);

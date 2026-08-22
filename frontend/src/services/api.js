@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://globetrotter-api-v2.vercel.app/api' : 'http://localhost:5000/api');
 export async function api(path, options = {}) {
   const token = options.token ?? localStorage.getItem('globetrotter_token') ?? localStorage.getItem('token') ?? localStorage.getItem('accessToken');
   const { token: _token, ...requestOptions } = options;
