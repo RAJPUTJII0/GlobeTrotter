@@ -91,6 +91,7 @@ Authentication is required. `id` is the returned `stopActivity.id`, not the cata
 - `POST /trips/:tripId/expenses` accepts `{ category, amount, note? }` where category is `transport`, `stay`, `food`, or `other`; returns `{ expense }` (`201`).
 - `DELETE /trips/:tripId/expenses/:expenseId` returns `204`.
 - `GET /trips/:tripId/budget` returns `{ breakdown, total, budgetLimit, remaining, averagePerDay }`. Activity costs are calculated from stop activities.
+- `POST /trips/:tripId/share` returns `{ shareSlug }`; `GET /public/trips/:shareSlug` is a read-only public trip view.
 
 ## Errors
 

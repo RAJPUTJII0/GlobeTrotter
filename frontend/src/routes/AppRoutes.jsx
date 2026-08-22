@@ -8,6 +8,7 @@ import Login from '../pages/Login.jsx';
 import MyTrips from '../pages/MyTrips.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Signup from '../pages/Signup.jsx';
+import PublicTrip from '../pages/PublicTrip.jsx';
 
 export default function AppRoutes() {
   return (
@@ -15,6 +16,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/public/:slug" element={<PublicTrip />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
       <Route path="/my-trips" element={<ProtectedRoute><MyTrips /></ProtectedRoute>} />

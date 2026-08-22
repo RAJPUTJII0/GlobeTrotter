@@ -1,0 +1,1 @@
+import { Router } from 'express'; import { getPublicTrip, shareTrip } from '../controllers/shareController.js'; import { requireAuth } from '../middleware/authMiddleware.js'; const router=Router(); router.get('/public/trips/:slug',getPublicTrip); router.post('/trips/:tripId/share',requireAuth,shareTrip); export default router;

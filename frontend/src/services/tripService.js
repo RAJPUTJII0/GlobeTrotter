@@ -29,3 +29,5 @@ export const getExpenses = (tripId) => api(`/trips/${tripId}/expenses`);
 export const createExpense = (tripId, data) => api(`/trips/${tripId}/expenses`, { method: 'POST', body: JSON.stringify(data) });
 export const deleteExpense = (tripId, expenseId) => api(`/trips/${tripId}/expenses/${expenseId}`, { method: 'DELETE' });
 export const getBudget = (tripId) => api(`/trips/${tripId}/budget`);
+export const shareTrip = (tripId) => api(`/trips/${tripId}/share`, { method: 'POST' });
+export const getPublicTrip = (shareSlug) => api(`/public/trips/${shareSlug}`);

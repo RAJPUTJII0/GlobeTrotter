@@ -5,6 +5,7 @@ import tripRoutes from './routes/tripRoutes.js';
 import activityRoutes from './routes/activityRoutes.js';
 import cityRoutes from './routes/cityRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
+import shareRoutes from './routes/shareRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
@@ -15,6 +16,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/trips', expenseRoutes);
 app.use('/api/cities', cityRoutes);
+app.use('/api', shareRoutes);
 app.use('/api', activityRoutes);
 app.use(errorHandler);
 export default app;

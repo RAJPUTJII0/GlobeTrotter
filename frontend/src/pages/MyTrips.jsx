@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/my-trips.css';
-import { deleteTrip, getTrips } from '../services/tripService.js';
+import { deleteTrip, getTrips, shareTrip } from '../services/tripService.js';
 
 function formatDate(date) {
   if (!date) return 'Date not set';
@@ -48,6 +48,11 @@ export default function MyTrips() {
     }
   }
 
+  async function handleShare(id) {
+    try { const { shareSlug } = await shareTrip(id); await navigator.clipboard?.writeText(`${window.location.origin}/public/${shareSlug}`); setNotice('Share link copied to clipboard.'); }
+    catch (requestError) { setError(requestError.message); }
+  }
+
   return (
     <div className="app-shell">
       <Navbar />
@@ -75,6 +80,7 @@ export default function MyTrips() {
                   <div className="trip-actions">
                     <button className="view-button" onClick={() => navigate(`/itinerary/${trip.id}`)} type="button">View itinerary</button>
                     <button onClick={() => navigate(`/itinerary-builder/${trip.id}`)} type="button">Edit</button>
+                    <button onClick={() => handleShare(trip.id)} type="button">Share</button>
                     <button className="delete-button" disabled={deletingId === trip.id} onClick={() => handleDelete(trip.id)} type="button">{deletingId === trip.id ? 'Deleting...' : 'Delete'}</button>
                   </div>
                 </div>
