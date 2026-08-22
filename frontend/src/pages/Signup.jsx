@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/login.css';
+import { signup } from '../services/authService.js';
 
 export default function Signup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const name = form.name.trim();
     const email = form.email.trim().toLowerCase();
@@ -34,17 +36,18 @@ export default function Signup() {
       return;
     }
 
-    const accounts = JSON.parse(localStorage.getItem('globetrotter_accounts') || '[]');
-    if (accounts.some((account) => account.email === email)) {
-      setError('An account with this email already exists. Please log in.');
-      return;
+    setIsSubmitting(true);
+    setError('');
+    try {
+      const response = await signup({ name, email, password: form.password });
+      localStorage.setItem('globetrotter_token', response.token);
+      localStorage.setItem('globetrotter_user', JSON.stringify(response.user));
+      navigate('/dashboard');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const user = { id: crypto.randomUUID(), name, email };
-    // Demo-only storage. Passwords will never be stored in the browser once Neon auth is connected.
-    localStorage.setItem('globetrotter_accounts', JSON.stringify([...accounts, user]));
-    localStorage.setItem('globetrotter_user', JSON.stringify(user));
-    navigate('/dashboard');
   }
 
   return (
@@ -64,7 +67,7 @@ export default function Signup() {
           <label htmlFor="confirmPassword">Confirm password</label>
           <input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Re-enter password" value={form.confirmPassword} onChange={updateField} />
           {error && <p className="form-error" role="alert">{error}</p>}
-          <button type="submit">Create account</button>
+          <button disabled={isSubmitting} type="submit">{isSubmitting ? 'Creating account...' : 'Create account'}</button>
         </form>
         <p className="signup-note">Already have an account? <Link to="/login">Log in</Link></p>
       </section>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/trip-form.css';
-import { addStoredTrip } from '../utils/tripStorage.js';
+import { createTrip } from '../services/tripService.js';
 
 const initialForm = { title: '', startDate: '', endDate: '', description: '' };
 
@@ -10,13 +10,14 @@ export default function CreateTrip() {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const title = form.title.trim();
 
@@ -30,17 +31,16 @@ export default function CreateTrip() {
       return;
     }
 
-    const trip = {
-      id: crypto.randomUUID(),
-      title,
-      description: form.description.trim(),
-      startDate: form.startDate,
-      endDate: form.endDate,
-      stops: [],
-      createdAt: new Date().toISOString(),
-    };
-    addStoredTrip(trip);
-    navigate('/my-trips');
+    setIsSubmitting(true);
+    setError('');
+    try {
+      await createTrip({ title, description: form.description.trim(), startDate: form.startDate, endDate: form.endDate });
+      navigate('/my-trips');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -60,7 +60,7 @@ export default function CreateTrip() {
             <label htmlFor="description">Description <small>(optional)</small></label>
             <textarea id="description" name="description" value={form.description} onChange={updateField} placeholder="What kind of adventure are you planning?" rows="5" />
             {error && <p className="form-error" role="alert">{error}</p>}
-            <div className="form-actions"><button className="cancel-button" onClick={() => navigate('/dashboard')} type="button">Cancel</button><button className="primary-button" type="submit">Create trip →</button></div>
+            <div className="form-actions"><button className="cancel-button" disabled={isSubmitting} onClick={() => navigate('/dashboard')} type="button">Cancel</button><button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? 'Creating trip...' : 'Create trip →'}</button></div>
           </form>
         </section>
       </main>

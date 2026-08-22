@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/my-trips.css';
-import { getStoredTrips, removeStoredTrip } from '../utils/tripStorage.js';
+import { deleteTrip, getTrips } from '../services/tripService.js';
 
 function formatDate(date) {
   if (!date) return 'Date not set';
@@ -11,15 +11,41 @@ function formatDate(date) {
 
 export default function MyTrips() {
   const navigate = useNavigate();
-  const [trips, setTrips] = useState(getStoredTrips);
+  const [trips, setTrips] = useState([]);
   const [notice, setNotice] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState('');
 
-  function deleteTrip(id) {
+  useEffect(() => {
+    let isMounted = true;
+    getTrips()
+      .then((items) => {
+        if (isMounted) setTrips(items);
+      })
+      .catch((requestError) => {
+        if (isMounted) setError(requestError.message);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    return () => { isMounted = false; };
+  }, []);
+
+  async function handleDelete(id) {
     const trip = trips.find((item) => item.id === id);
-    if (!trip || !window.confirm(`Delete "${trip.title}"? This cannot be undone.`)) return;
-    const updatedTrips = removeStoredTrip(id);
-    setTrips(updatedTrips);
-    setNotice('Trip deleted successfully.');
+    if (!trip || deletingId || !window.confirm(`Delete "${trip.title}"? This cannot be undone.`)) return;
+    setDeletingId(id);
+    setError('');
+    try {
+      await deleteTrip(id);
+      setTrips((current) => current.filter((item) => item.id !== id));
+      setNotice('Trip deleted successfully.');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setDeletingId('');
+    }
   }
 
   return (
@@ -32,8 +58,9 @@ export default function MyTrips() {
         </section>
 
         {notice && <p className="trip-notice" role="status">{notice}</p>}
+        {error && <p className="form-error" role="alert">{error}</p>}
 
-        {trips.length === 0 ? (
+        {isLoading ? <p role="status">Loading your trips...</p> : trips.length === 0 ? (
           <section className="empty-trips"><span aria-hidden="true">🧭</span><h2>No trips planned yet</h2><p>Your next adventure is waiting. Start creating your first itinerary.</p><Link className="primary-button" to="/create-trip">+ Plan Your First Trip</Link></section>
         ) : (
           <section className="saved-trips-grid" aria-label="Saved trips">
@@ -44,11 +71,11 @@ export default function MyTrips() {
                   <p className="saved-trip-dates">{formatDate(trip.startDate)} — {formatDate(trip.endDate)}</p>
                   <h2>{trip.title}</h2>
                   <p className="trip-description">{trip.description || 'No description added yet.'}</p>
-                  <p className="destination-count">📍 {trip.stops?.length || 0} destinations</p>
+                  <p className="destination-count">📍 {trip.destinationCount} destinations</p>
                   <div className="trip-actions">
                     <button className="view-button" onClick={() => navigate(`/itinerary/${trip.id}`)} type="button">View itinerary</button>
                     <button onClick={() => navigate(`/itinerary-builder/${trip.id}`)} type="button">Edit</button>
-                    <button className="delete-button" onClick={() => deleteTrip(trip.id)} type="button">Delete</button>
+                    <button className="delete-button" disabled={deletingId === trip.id} onClick={() => handleDelete(trip.id)} type="button">{deletingId === trip.id ? 'Deleting...' : 'Delete'}</button>
                   </div>
                 </div>
               </article>

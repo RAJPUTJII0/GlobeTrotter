@@ -1,8 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import TripCard from '../components/TripCard.jsx';
 import '../styles/dashboard.css';
-import { getStoredTrips } from '../utils/tripStorage.js';
+import { getTrips } from '../services/tripService.js';
 
 const destinations = [
   { name: 'Jaipur', country: 'India', emoji: '🏰' },
@@ -15,7 +16,24 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const savedUser = JSON.parse(localStorage.getItem('globetrotter_user') || '{}');
   const userName = savedUser.name || 'Traveller';
-  const trips = getStoredTrips();
+  const [trips, setTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    getTrips()
+      .then((items) => {
+        if (isMounted) setTrips(items);
+      })
+      .catch((requestError) => {
+        if (isMounted) setError(requestError.message);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    return () => { isMounted = false; };
+  }, []);
 
   function formatDates(trip) {
     const formatter = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -37,8 +55,8 @@ export default function Dashboard() {
 
         <section className="content-section" aria-labelledby="upcoming-trips">
           <div className="section-heading"><div><h2 id="upcoming-trips">Your upcoming trips</h2><p>Keep your plans organised in one place.</p></div><Link to="/my-trips">View all trips</Link></div>
-          {trips.length > 0 ? (
-            <div className="trip-grid">{trips.slice(0, 2).map((trip) => <TripCard key={trip.id} title={trip.title} dates={formatDates(trip)} cities={trip.stops?.length || 0} emoji="✈️" onView={() => navigate(`/itinerary/${trip.id}`)} />)}</div>
+          {isLoading ? <p role="status">Loading your trips...</p> : error ? <p className="form-error" role="alert">{error}</p> : trips.length > 0 ? (
+            <div className="trip-grid">{trips.slice(0, 2).map((trip) => <TripCard key={trip.id} title={trip.title} dates={formatDates(trip)} cities={trip.destinationCount} emoji="✈️" onView={() => navigate(`/itinerary/${trip.id}`)} />)}</div>
           ) : (
             <div className="dashboard-empty"><span aria-hidden="true">🧭</span><div><h3>No trips planned yet</h3><p>Create your first trip and start building your itinerary.</p></div><Link to="/create-trip">Plan a trip</Link></div>
           )}

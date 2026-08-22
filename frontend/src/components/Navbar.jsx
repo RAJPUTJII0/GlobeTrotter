@@ -6,6 +6,7 @@ export default function Navbar() {
 
   function handleLogout() {
     localStorage.removeItem('globetrotter_user');
+    localStorage.removeItem('globetrotter_token');
     navigate('/login');
   }
 

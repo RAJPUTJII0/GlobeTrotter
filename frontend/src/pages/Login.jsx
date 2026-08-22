@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/login.css';
+import { login } from '../services/authService.js';
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const trimmedEmail = email.trim();
 
@@ -22,13 +24,18 @@ export default function Login() {
       return;
     }
 
-    // Temporary client-side session until the Neon-backed auth API is ready.
-    localStorage.setItem('globetrotter_user', JSON.stringify({
-      email: trimmedEmail,
-      name: trimmedEmail.split('@')[0],
-    }));
+    setIsSubmitting(true);
     setError('');
-    navigate('/dashboard');
+    try {
+      const response = await login({ email: trimmedEmail, password });
+      localStorage.setItem('globetrotter_token', response.token);
+      localStorage.setItem('globetrotter_user', JSON.stringify(response.user));
+      navigate('/dashboard');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -63,7 +70,7 @@ export default function Login() {
           />
 
           {error && <p className="form-error" role="alert">{error}</p>}
-          <button type="submit">Log in</button>
+          <button disabled={isSubmitting} type="submit">{isSubmitting ? 'Logging in...' : 'Log in'}</button>
         </form>
 
         <p className="signup-note">Don&apos;t have an account? <Link to="/signup">Sign up</Link></p>
