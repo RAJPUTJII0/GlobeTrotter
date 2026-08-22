@@ -2,3 +2,4 @@
 @media (max-width: 700px) { .my-trips-page { padding: 32px 18px 52px; }.my-trips-heading { align-items: flex-start; flex-direction: column; gap: 22px; }.saved-trips-grid { grid-template-columns: 1fr; }.saved-trip-card { padding: 18px; } }
 @media (max-width: 420px) { .saved-trip-card { gap: 14px; }.saved-trip-icon { font-size: 26px; height: 54px; min-width: 54px; }.trip-actions { gap: 12px; } }
 @media (max-width: 420px) { .saved-trip-card { box-sizing: border-box; min-width: 0; width: 100%; }.saved-trip-details { max-width: 100%; min-width: 0; }.saved-trip-details h2 { overflow-wrap: anywhere; white-space: normal; }.trip-actions { min-width: 0; } }
+.trip-actions .budget-button { color: #146c94; text-decoration: none; }

@@ -82,6 +82,7 @@ export default function MyTrips() {
                   <p className="destination-count">📍 {trip.destinationCount} destinations</p>
                   <div className="trip-actions">
                     <button className="view-button" onClick={() => navigate(`/itinerary/${trip.id}`)} type="button">View itinerary</button>
+                    <Link className="budget-button" to={`/budget/${trip.id}`}>Budget</Link>
                     <button onClick={() => navigate(`/itinerary-builder/${trip.id}`)} type="button">Edit</button>
                     <button onClick={() => handleShare(trip.id)} type="button">Share</button>
                     <button className="delete-button" disabled={deletingId === trip.id} onClick={() => handleDelete(trip.id)} type="button">{deletingId === trip.id ? 'Deleting...' : 'Delete'}</button>
