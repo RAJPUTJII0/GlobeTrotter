@@ -15,9 +15,8 @@ services:
       - key: FRONTEND_URL
         sync: false
 
-  - type: static_site
+  - type: static
     name: globetrotter-frontend
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
