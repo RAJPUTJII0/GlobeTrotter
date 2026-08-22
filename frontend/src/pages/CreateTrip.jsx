@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/trip-form.css';
+import { addStoredTrip } from '../utils/tripStorage.js';
 
 const initialForm = { title: '', startDate: '', endDate: '', description: '' };
 
@@ -38,8 +39,7 @@ export default function CreateTrip() {
       stops: [],
       createdAt: new Date().toISOString(),
     };
-    const savedTrips = JSON.parse(localStorage.getItem('globetrotter_trips') || '[]');
-    localStorage.setItem('globetrotter_trips', JSON.stringify([trip, ...savedTrips]));
+    addStoredTrip(trip);
     navigate('/my-trips');
   }
 

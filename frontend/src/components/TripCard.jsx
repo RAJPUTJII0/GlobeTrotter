@@ -1,4 +1,4 @@
-export default function TripCard({ title, dates, cities, emoji }) {
+export default function TripCard({ title, dates, cities, emoji, onView }) {
   return (
     <article className="trip-card">
       <div className="trip-card-image" aria-hidden="true">{emoji}</div>
@@ -6,7 +6,7 @@ export default function TripCard({ title, dates, cities, emoji }) {
         <p className="trip-card-dates">{dates}</p>
         <h3>{title}</h3>
         <p>{cities} destinations</p>
-        <button type="button">View itinerary →</button>
+        <button onClick={onView} type="button">View itinerary →</button>
       </div>
     </article>
   );

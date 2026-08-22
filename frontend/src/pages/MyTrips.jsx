@@ -2,14 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/my-trips.css';
-
-function readTrips() {
-  try {
-    return JSON.parse(localStorage.getItem('globetrotter_trips') || '[]');
-  } catch {
-    return [];
-  }
-}
+import { getStoredTrips, removeStoredTrip } from '../utils/tripStorage.js';
 
 function formatDate(date) {
   if (!date) return 'Date not set';
@@ -17,14 +10,13 @@ function formatDate(date) {
 }
 
 export default function MyTrips() {
-  const [trips, setTrips] = useState(readTrips);
+  const [trips, setTrips] = useState(getStoredTrips);
   const [notice, setNotice] = useState('');
 
   function deleteTrip(id) {
     const trip = trips.find((item) => item.id === id);
     if (!trip || !window.confirm(`Delete "${trip.title}"? This cannot be undone.`)) return;
-    const updatedTrips = trips.filter((item) => item.id !== id);
-    localStorage.setItem('globetrotter_trips', JSON.stringify(updatedTrips));
+    const updatedTrips = removeStoredTrip(id);
     setTrips(updatedTrips);
     setNotice('Trip deleted successfully.');
   }
